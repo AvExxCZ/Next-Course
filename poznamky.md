@@ -998,6 +998,233 @@ When we talk about React Server Components (RSC) we are dealing with three key p
 3. React ( our library )
 
 
-RSC Loading sequencce... npotrebuji nejake vysvetleni
+RSC Loading sequencce
 
 RSC Update Sequence
+
+
+
+
+Server rendering strategies
+
+- Static Rendering
+
+- Dynamic Rendering
+
+- Streaming
+
+
+
+
+Static Rendering
+
+Static rendering is a server rendering strategy where we generate HTML pages when building our application
+
+Think of ot as preaparing all your content in advance - before any user visits your site
+
+Once built, these pages can be cached by CDNs and served instantly to users
+
+With this approach the same pre-rendered page can be shared among different users, giving your app a significant performance boost
+
+Static rendering perfect for things like blog posts, e-commerce product listing, documentation, and marketing pages
+
+
+
+How to statically render?
+
+Static rendering is the default strategy in the app router
+
+All routes are automatically prepared at build time without any additional setup
+
+"Hold on - you keep talking about generating HTML at build time, but we havent built our application yet, right? We are just running it in development mode?"
+
+
+
+Production server vs dev server
+
+In production, we create one optimized build and deploy it - no on-the-fly changes after deployment
+
+A development server, on the other hand, focuses on the developer experience
+
+We need to see our changes immediately in the browser without rebuilding the app every time
+
+In production, pages are pre-rendered once during the build
+
+In development, pages are pre-rendered on every request
+
+
+
+Dynamic Rendering
+
+Dxynamic rendering in a server rendering strategy where routes are rendered uniquely for each user when they make request
+
+It is useful when you need to show personalized data or information thats only availible at request time ( and not ahead of time during prerending ) - things like cookies or url search parameters
+
+News websites, personalized shopping pages, and social media feeds are some examples where dynamic rendering is beneficial
+
+
+
+How to dynamically render
+
+Next.js automatically switches to dynamic rendering for an entire route when it detects what we call a "dynamic function" or "dynamic API"
+
+In Next.js, these dynamic functions are: 
+ - cookies()
+ - headers()
+ - connection()
+ - draftMode()
+ - searchParams prop
+ - after()
+
+Using any of these automatically opts your entire route into dynamic rendering at request time
+
+
+
+Dynamic rendering summary
+
+Dynamic rendering is a stratefy where the HTML in generated at request time
+
+Next.js automatically enables it when it encounters dynamic functions like cookies. headers, connecrion, draftMode, after, or searchParams prop
+
+Dynamic rendering is great for personalized content like social media feeds
+
+You dont have to stress about  choosing between static and dynamic rendering
+
+Next.js automatically selects the optional rendering strategy for each route based on the features and APIs you are using
+
+
+
+generateStaticParams()
+
+generateStaticParams is a function that
+ - works alongside dynamic route segments
+ - to generate static routes during the build time
+ - instead of on demand at request time
+ - giving us a nice performance boost
+
+
+
+dynamicParams
+
+Controll what happens when a dynamic segment is visited that was not generated with generateStaticProps
+
+true - Next.js will statically render pages on demand for any dynamic segments not included in generateStaticParams()
+
+false - Next.js will return a 404 error for any dynamic segments not included in our pre-rendered list
+
+
+dynamicParams contd.
+
+true:
+If you are building an e-commerce site, you will probably want to keep dynamicParams set to true
+
+This way, you can pre-render your most popular pages for better performace, but still allow access to all your other products - they will just be rendered on demand
+
+false:
+If you are working with something like a blog where you have a smaller, more fixed number of pages, you can pre-render all of them and set dynamicParams to false
+
+If someone tries to access a blog post that doesnt exist, they will get a clean 404 error instead of waiting for a page that will never exist
+
+
+
+
+Streaming
+
+Streaming is a strategy that allows for progressive UI rendering from a server
+
+Work is broken into smaller chunks and streamed to the client as soon as they are ready
+
+This means users can see parts of the page right away without waiting for everything to load
+
+Its particulary powerful for improveing initial page load tiems and handling UI elements that depend on slower data fetches, which would normaly hold up the entire route
+
+Streaming comes built in right into the App router
+
+Wrapping slower elements with suspense can provide better UX and faster load of other content on the page like title, optionaly you can use fallback={<p>loading...</p>}
+
+
+
+
+Server and client composition patterns
+
+Server components
+ - fetching data
+ - accessing backend resources directly
+ - keeping sensitive information (like access tokens and API keys) secure on the server
+ - handling large dependencies server-side - which meand less JavaScript for your users to download
+
+Client components
+ - adding interactivity
+ - handling event listeners (like onClick(), onChange(), etc.)
+ - managing state and lifecycle effects (using hooks like useState(), useReducer(), useEffect())
+ - working with browser-specific APIs
+ - implementing custom hooks
+ - Using React class components
+
+
+
+
+Server-only code
+
+Some code is specifically designed to run exclusively on the server
+
+Think about modules or functions that work with multiple libraries, handle environment variables, communicate directly with database, or process sensitive information
+
+Since JavaScript modules can be shared between Server and Client Components, code meant for the server could accidentally find its way to the client
+
+This is bad news as it can bloat your JavaScript bundle, expose your secret keys, database queries, and sensitive business logic
+
+Its super important to keep server-only code separate from the client-side code
+
+
+server-only package
+
+-- npm install server-only
+
+Throws a build-time error if someone accidentaly imports server code into a Client Component
+
+import "server-only"; at the top of the document
+
+
+
+
+Third-party packages
+
+Server Components have introduced an exciting new paradigm in React, and the ecosystem is evolving to keep up
+
+Third-party packages are starting to add the "use client" directive to components that need client-side features, making it cleaer where they should run
+
+Many npm packages have not made this transition yet
+
+This means while they work fine in Client Components, they might break or fail completely in Server Components
+
+We can wrap the third-party components that need client-side features in our own Client Components
+
+
+
+
+Context providers
+
+Context providers typically live near the root of an application to share global state and logic
+
+For example, your application's theme
+
+However, React context is not supported in Server Components
+
+If you try to create a context at your application's root, you will run into an error
+
+The solution is to create your context and render its provider inside a dedicated Client Component
+
+
+
+
+Client-only code
+
+
+
+
+
+
+
+
+
