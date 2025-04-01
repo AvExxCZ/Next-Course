@@ -1220,11 +1220,241 @@ The solution is to create your context and render its provider inside a dedicate
 
 Client-only code
 
+Just like how we need to keep certain operations server-side, its equelly crucial to keep some functionality strictly on the client side
+
+Client-only code works with browser-specific features - think DOM manipulation, window object interactions, or localStorage operations
+
+These features arent available on the serve, so we need to make sure such code runs only on the client side to avoid server-side rendering errors
+
+To prevent unintended server side usage of client code, we can use a package called client-only
+
+npm i client-only --force
+
+import "client-only";
+
+
+
+
+Client Component placement
+
+Since server components cant handle state and interactivity, we need client components to fill this gap
+
+The key recommendation here is to position these client components lower in your component tree
+
+
+Interleaving Server and Client Components
+
+- server component inside another server component
+- client component inside another client component
+- client component inside a server component
+- server component inside a client component => ERROR
+
+Workaround an unsupported patterns
+
+
+
+
+Rendering Section Summary
+
+CSR
+SSR
+Suspense for SSR
+RSCs
+Server and client components
+RSC rendering lifecycle
+Static and dynamic rendering
+Streaming
+Server and client composition patterns
 
 
 
 
 
+Data fetching and mutations
 
+So far, we have been working with har-coded content in our routes and components
+
+In actual enterprise apps, you are usually pulling data from external sources
+
+The App Router is built on React Server Components (RSC) architecture which gives us the flexibility to fetch data using either server components or client components
+
+
+
+Data fetching in App Router contd.
+
+Its usually preferable to use server components for data operations because:
+
+- You can directly communicate with your database and file systems on the server side
+
+- You get better performance since you are closer to your data sources
+ 
+- Your client-side bundle stays lean because the heavy lifting happens server-side
+
+- Your sensitive operations and API keys remain source on the server
+
+
+
+Fetching data in client components
+
+We should use client components for fetching only when we absolutly need to, like when you need real time updates or when your data depends on client site interactions that you can predict on the server side
+
+For everything else the recommended way to fetch data is in the server components
+
+
+
+Fetching data with Server Components
+
+The RSC architecture supports async and await keywords in Server Components
+
+This means we can write our data fetching code just like regular JavaScript, using async functions coupled with the await keyword
+
+
+
+Request memoization
+
+-- react will deduplicate fetch request with the same url and options
+
+This means you can fetch data wherever you need it in your component tree without worrying about duplicate network requests
+
+React will only make the actual fetch once and reuse the result for subsequent calls during the same render pass
+
+Its a React feature and thereby included in Next.js
+
+Lets you write data-fetching code exactly where you need it rather than having to centralize fetches and pass data down through props
+
+
+
+
+Loading and Error states for data fetching
+
+While client components require you to manage these states with separate variables and conditional rendering, server components make this process much cleaner
+
+To implement a loading state, all we need to do is define and export a React component in loading.tsx
+
+For handling errors, define and export a React component in error.tsx 
+
+
+
+
+Data fetching patterns
+
+When fetching data inside components, you need to be aware of two data fetching patterns:
+
+1. Sequential
+2. Parallel
+
+Sequential: requests in a component tree are dependent on each other. This can lead to longer loading times.
+
+Parallel: requests in a route are eagerly initiated and will load data at the same time. This reduces the total time it takes to load data.
+
+
+
+Suquential fetching 
+
+We will create posts component
+ - fetches all posts
+ - for each post, fetch author using the userId property
+ - example of sequential fetching because we need the userId from each post before we can fetch its author
+
+
+
+Fetching data from a database
+
+We have looked at how to fetch data from API endponints using the fetch API
+
+lets dive into fetching data from a database in Server Components
+
+What we are about to cover is super important - its the foundation for data mutations and server actions coming up next
+
+Two key reasons why fetching data directly from a database is powerfull
+
+1. server components have direct access to server-side resources, which makes database interactions seamless
+
+2. since everything happens on the server, we dont need API routes or worry about exposing sensitive information to the client
+
+
+Fetching from a database contd.
+
+We are going to be working with two super helpful tools - SQLite and Prisma 
+
+SQLite
+ - a simple, file-based database to store information in your project
+ - it doesnt require a server or a complex setup and its perfect for learning and prototyping
+
+Prisma
+ - a tool that makes it really easy to talk to your database
+ - its like a translator that helps your code communicate with SQLite
+
+
+
+
+Data mutations 
+
+When we work with data, we are typically performing what we call CRUD operations.
+
+- Create
+- Read
+- Upadte
+- Delete
+
+
+
+Data mutations contd.
+
+To follow along, make sure to check out the previous topic on fetching data from a database where we set up our prisma client with a SQGLite database
+
+To really appreciate the app router's approach to data mutations, its worth looking at how we have traditionally handled data mutations in React
+
+This comparison will help us appreciate the benefits of the app router approach
+
+## Add here how does the basic react data mutations work
+
+But there is better way to handle this logic
+
+
+
+
+
+Server Actions
+
+Server Actions are asynchronous functions that are executed on the server
+
+They can be called in Server and Client Componnets to handle from submissions and data mutiations in Next.js applications
+
+You should use Server Actions when you
+
+ - need to perform secure database operations
+ - want to reduce API boilerplate code
+ - need progressive enhancement for forms
+ - want to optimize for performance
+
+
+
+
+Server Actions convention
+
+A Server Action can be defined with the React "use server" directive
+
+You can place the directive
+ - at the top of an async function to mark the function as a Server Action, or
+ - at the top of a separate file to mark all exports of that file as Server Actions
+
+## how to use server actions - demo
+
+
+Server Actions benefits
+
+Simplified code: they dramatically simplify your code as there in no need for separate API routes or client-side state management for form data
+
+Improved security: they boost security by keeping sensitive operations serve-side, away from potential threats
+
+Better performance: they improve performance because there is less JavaScript running on the client, leading to faster load times and better core web vitals
+
+Progressive enhancement: forms keep working even if JavaScript is turned off in the browser - making your apps more accessible and resilient
+
+
+
+
+Pending state with useFormStatus
 
 
