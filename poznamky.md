@@ -1457,4 +1457,58 @@ Progressive enhancement: forms keep working even if JavaScript is turned off in 
 
 Pending state with useFormStatus
 
+useFormStatus is a React hook that gives us status informations about the last form submission
+
+const status = useFormStatus()
+
+- penging: a boolean that indicates if the parent <form> iscurrently submtting
+- data: an object containing the form's submission data 
+- method: a string (either 'get' or 'post') showing the HTTP method being used 
+- action: a reference to the function that was passed to the parent <form>'s action prop
+
+We will use "pending" to disable our submit button while the form is being processed
+
+
+
+Form validation with useActionState
+
+useActionState is a React hook that allows us to update state based on the result of a form action
+
+It is particulary helpful for handling validation and error messsages
+
+## code example, povidani k tomu ajk to cele funguje a co tento hook vraci
+
+## reseni erroru ze nemuzeme pouzit tento client hook a zaroven use server u ty server action
+
+
+
+Separating Server Actions
+
+## predchzi error basically vyresime tak ze celu nasi server action presuneme do jineho souboru a nahoru dame "use server", opravime importy a exporty idk... do ty server action musime pridat nejakej previos state protoze ho automaticky dostane idk idk...
+
+
+
+Pending (useFormStatus) vs isPending (useActionState)
+
+Both can help us determine if a form is being submitted and let us disable the submit button - but there is an interesting difference between them
+
+The pending state from useFormStatus is speccifically for form submissions
+
+isPending from useActionState can be used with any Action, not just submissions
+
+How to choose one from them?
+- Go with "pending" from useFormStatus when you are building reusable components that are meant to live inside forms. For example, submit buttons or loading spinners that you will want to use across different forms in your application.
+
+- Choose "isPending" from useActionState when you need to keep track of server actions that are not necessarily related to form submissions. It gives you that extra flexibility.
+
+## next 15 - video 78 - priadni nazoru lidi z komentaru kdy a u ceho je pouzit
+
+
+
+
+Update Server Action
+
+## code example here
+
+
 
